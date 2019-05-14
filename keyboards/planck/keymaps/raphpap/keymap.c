@@ -26,6 +26,8 @@ enum planck_layers {
   _DVORAK,
   _LOWER,
   _RAISE,
+  _ACCENT,
+  _UPPER_ACCENT,
   _PLOVER,
   _ADJUST
 };
@@ -41,6 +43,8 @@ enum planck_keycodes {
 
 #define LOWER MO(_LOWER)
 #define RAISE MO(_RAISE)
+#define ACCENT MO(_ACCENT)
+#define UP_ACC MO(_UPPER_ACCENT)
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /* Plover layer (http://opensteno.org)
@@ -159,15 +163,57 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |------+------+------+------+------+------|------+------+------+------+------+------|
  * | Shift|      |   Z  |   X  |   C  |   V  |   B  |   N  |   M  |   ,  |   .  |  /   |
  * |------+------+------+------+------+------+------+------+------+------+------+------|
- * | Brite| Ctrl | Alt  | GUI  |Lower |    Space    |Raise | Left | Down |  Up  |Right |
+ * |Accent| Ctrl | Alt  | GUI  |Lower |    Space    |Raise | Left | Down |  Up  |Right |
  * `-----------------------------------------------------------------------------------'
  */
 [_QWERTY] = LAYOUT_planck_grid(
     KC_ESC,  KC_Q,       KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_BSPC,
     KC_TAB,  KC_A,       KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_ENT,
     KC_LSFT, UC(0x2603), KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH,
-    BACKLIT, KC_LCTL,    KC_LALT, KC_LGUI, LOWER,   KC_SPC,  KC_SPC,  RAISE,   KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT
+    ACCENT,  KC_LCTL,    KC_LALT, KC_LGUI, LOWER,   KC_SPC,  KC_SPC,  RAISE,   KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT
 ),
+
+/* Lower
+ * ,-----------------------------------------------------------------------------------.
+ * | ESC  |   â  |   è  |   é  |   ë  |      |      |   (  |   )  |   <  |   >  | Bksp |
+ * |------+------+------+------+------+-------------+------+------+------+------+------|
+ * | TAB  |   à  |      |   ê  |      |      |      |   {  |   }  |   '  |   "  |  `   |
+ * |------+------+------+------+------+------|------+------+------+------+------+------|
+ * | Shift|   ù  |      |      |   ç  |   î  |   ô  |   [  |   ]  |   «  |   »  |  |   |
+ * |------+------+------+------+------+------+------+------+------+------+------+------|
+ * |      |      |      |      |      |             |      |      |      |      |      |
+ * `-----------------------------------------------------------------------------------'
+ */
+// [_LOWER] = LAYOUT_planck_grid(
+//     KC_ESC,   UC(0x00E2), UC(0x00E8), UC(0x00E9),  UC(0x00EB), XXXXXXX,    XXXXXXX,    KC_LPRN, KC_RPRN, KC_LT,       KC_GT,       KC_BSPC,
+//     KC_TAB,   UC(0x00E0), XXXXXXX,    UC(0x00EA),  XXXXXXX,    XXXXXXX,    XXXXXXX,    KC_LCBR, KC_RCBR, KC_QUOT,     KC_DQUO,     KC_GRAVE,
+//     KC_LSFT,  UC(0x00F9), XXXXXXX,    XXXXXXX,     UC(0x00E7), UC(0x00EE), UC(0x00F4), KC_LBRC, KC_RBRC, UC(0x00AB),  UC(0x00BB),  UC(0x007C),
+//     _______,  _______,    _______,    _______,     _______,    _______,    _______,    _______, _______, _______,     _______,     _______
+// ),
+
+/* Accent
+ * ,-----------------------------------------------------------------------------------.
+ * |      |   â  |   è  |   é  |   ë  |      |   û  |   ù  |   î  |   ô  |      |      |
+ * |------+------+------+------+------+-------------+------+------+------+------+------|
+ * |      |   à  |   ä  |   ê  |      |      |      |   ü  |   ï  |   ö  |      |      |
+ * |------+------+------+------+------+------|------+------+------+------+------+------|
+ * |      |   ù  |      |      |   ç  |      |      |      |      |      |      |      |
+ * |------+------+------+------+------+------+------+------+------+------+------+------|
+ * |      |      |      |      |      |             |      |      |      |      |      |
+ * `-----------------------------------------------------------------------------------'
+ */
+ [_ACCENT] = LAYOUT_planck_grid(
+     _______,  UC(0x00E2), UC(0x00E8), UC(0x00E9),  UC(0x00EB), _______,  UC(0x00FB), UC(0x00F9), UC(0x00EE), UC(0x00F4),  _______, _______,
+     _______,  UC(0x00E0), UC(0x00E4),  UC(0x00EA), _______,    _______,  _______,    UC(0x00FC), UC(0x00EF), UC(0x00F6),  _______, _______,
+     UP_ACC,   UC(0x00F9), _______,     _______,    UC(0x00E7), _______,  _______,    _______,    _______,    _______,    _______, _______,
+     _______,  _______,    _______,     _______,    _______,    _______,  _______,    _______,    _______,    _______,    _______, _______
+ ),
+ [_UPPER_ACCENT] = LAYOUT_planck_grid(
+     _______,  UC(0x00C2), UC(0x00C8), UC(0x00C9),  UC(0x00CB), _______,  UC(0x00DB), UC(0x00D9), UC(0x00CE), UC(0x00D4),  _______, _______,
+     _______,  UC(0x00C0), UC(0x00C4),  UC(0x00CA), _______,  _______,    _______,    UC(0x00DC), UC(0x00CF), UC(0x00D6),  _______, _______,
+     _______,  UC(0x00D9),  _______,    _______,   UC(0x00C7), _______,  _______,     _______,     _______,   _______,    _______, _______,
+     _______,  _______,     _______,    _______,   _______,    _______,  _______,     _______,    _______,   _______,     _______,   _______
+ ),
 
 /* Lower V2
  * ,-----------------------------------------------------------------------------------.
@@ -200,7 +246,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * `-----------------------------------------------------------------------------------'
  */
 [_RAISE] = LAYOUT_planck_grid(
-    KC_ESC,   KC_EXLM, KC_AT,    KC_HASH, KC_DLR,  KC_PERC, KC_QUES, KC_AMPR, KC_ASTR, KC_MINS, KC_EQL,  KC_BSPC,
+    KC_ESC,   KC_EXLM, KC_AT,    KC_HASH, KC_DLR,  KC_PERC, KC_QUES, KC_AMPR, KC_ASTR, KC_MINS, KC_EQL,  KC_DEL,
     KC_TAB,   XXXXXXX, XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, KC_LPRN, KC_RPRN, KC_UNDS, KC_PLUS, KC_GRAVE,
     KC_LSFT,  XXXXXXX, XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, KC_QUOT, KC_DQUO, UC(0x007C),
     _______,  _______, _______,  _______, _______, _______, _______, _______, _______, _______,  _______, _______

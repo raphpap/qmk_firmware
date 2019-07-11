@@ -258,7 +258,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * ,-----------------------------------------------------------------------------------.
  * | Reset|Qwerty|      |Plover|      |      | Mute | VolUP| VolDo|MIDIon|MIDIof|  Del |
  * |------+------+------+------+------+-------------+------+------+------+------+------|
- * |Debug |      |      |Dvorak|      |      |      | NxtTr|Play/P|Aud on|Aud of|      |
+ * |Debug |      |      |Dvorak|      |      | Home | NxtTr|Play/P|Aud on|Aud of|      |
  * |------+------+------+------+------+------|------+------+------+------+------+------|
  * |      |      |      |Colemk|      |TermON|TermOf|      |      |Mus on|Musoff|      |
  * |------+------+------+------+------+------+------+------+------+------+------+------|
@@ -267,7 +267,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  */
 [_ADJUST] = LAYOUT_planck_grid(
     RESET,   QWERTY,  _______, PLOVER,  _______, _______, KC_MUTE,  KC_MNXT, KC_VOLD, MI_ON,  MI_OFF, KC_DEL ,
-    DEBUG,   _______, _______, DVORAK,  _______, _______, _______,  KC_VOLU, KC_MPLY, AU_ON,  AU_OFF, _______,
+    DEBUG,   _______, _______, DVORAK,  _______, _______, KC_HOME,  KC_VOLU, KC_MPLY, AU_ON,  AU_OFF, _______,
     _______, _______, _______, COLEMAK, _______, TERM_ON, TERM_OFF, _______, _______, MU_ON,  MU_OFF, _______,
     _______, _______, _______, _______, _______, _______, _______,  _______, _______, MUV_DE, MUV_IN, _______
 )

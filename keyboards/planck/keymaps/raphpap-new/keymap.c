@@ -29,11 +29,21 @@ typedef struct {
 
 enum { SINGLE_TAP = 1, SINGLE_HOLD = 2, DOUBLE_TAP = 3, DOUBLE_HOLD = 4, DOUBLE_SINGLE_TAP = 5, TRIPLE_TAP = 6, TRIPLE_HOLD = 7 };
 
-enum { TD_USER = 0 };
+enum { TD_USER = 0, TD_A_CIRC = 1, TD_E_CIRC = 2, TD_E_TREM = 3, TD_I_TREM = 4, TD_O_CIRC = 5 };
 
 int  cur_dance(qk_tap_dance_state_t *state);
 void user_finished(qk_tap_dance_state_t *state, void *user_data);
 void user_reset(qk_tap_dance_state_t *state, void *user_data);
+void a_circ_finished(qk_tap_dance_state_t *state, void *user_data);
+void a_circ_reset(qk_tap_dance_state_t *state, void *user_data);
+void e_circ_finished(qk_tap_dance_state_t *state, void *user_data);
+void e_circ_reset(qk_tap_dance_state_t *state, void *user_data);
+void e_trem_finished(qk_tap_dance_state_t *state, void *user_data);
+void e_trem_reset(qk_tap_dance_state_t *state, void *user_data);
+void i_trem_finished(qk_tap_dance_state_t *state, void *user_data);
+void i_trem_reset(qk_tap_dance_state_t *state, void *user_data);
+void o_circ_finished(qk_tap_dance_state_t *state, void *user_data);
+void o_circ_reset(qk_tap_dance_state_t *state, void *user_data);
 
 #define LOWER MO(_LOWER)
 #define RAISE MO(_RAISE)
@@ -56,16 +66,16 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     /* Accent
      * ,-----------------------------------------------------------------------------------.
-     * |      |      |   è  |   é  |   ¨  |      |      |   ù  |   ¨  |   ^  |      |      |
+     * |      |   â  |   è  |   é  |   ë  |      |      |   ù  |   ï  |   ô  |      |      |
      * |------+------+------+------+------+-------------+------+------+------+------+------|
-     * |      |   à  |      |   ^  |      |      |      |      |      |      |      |      |
+     * |      |   à  |      |   ê  |      |      |      |      |      |      |      |      |
      * |------+------+------+------+------+------|------+------+------+------+------+------|
      * |      |   ^  |   ¨  |   `  |   ç  |      |      |      |      |      |      |      |
      * |------+------+------+------+------+------+------+------+------+------+------+------|
      * |      |      |      |      |      |             |      |      |      |      |      |
      * `-----------------------------------------------------------------------------------'
      */
-    [_ACCENT] = LAYOUT_planck_grid(_______, XXXXXXX, KC_QUOT, KC_SLASH, LSFT(KC_LBRC), XXXXXXX, KC_LBRC, KC_GRV, LSFT(KC_LBRC), KC_LBRC, XXXXXXX, _______, _______, KC_NUHS, XXXXXXX, KC_LBRC, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______, _______, KC_LBRC, LSFT(KC_LBRC), LALT(KC_LBRC), KC_RBRC, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______),
+    [_ACCENT] = LAYOUT_planck_grid(_______, TD(TD_A_CIRC), KC_QUOT, KC_SLASH, TD(TD_E_TREM), XXXXXXX, KC_LBRC, KC_GRV, TD(TD_I_TREM), TD(TD_O_CIRC), XXXXXXX, _______, _______, KC_NUHS, XXXXXXX, TD(TD_E_CIRC), XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______, _______, KC_LBRC, LSFT(KC_LBRC), LALT(KC_LBRC), KC_RBRC, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______),
 
     /* Lower
      * ,-----------------------------------------------------------------------------------.
@@ -253,6 +263,7 @@ int cur_dance(qk_tap_dance_state_t *state) {
 
 static tap xtap_state = {.is_press_action = true, .state = 0};
 
+void user_reset(qk_tap_dance_state_t *state, void *user_data) { xtap_state.state = 0; }
 void user_finished(qk_tap_dance_state_t *state, void *user_data) {
     xtap_state.state = cur_dance(state);
     switch (xtap_state.state) {
@@ -313,18 +324,67 @@ void user_finished(qk_tap_dance_state_t *state, void *user_data) {
     }
 }
 
-void user_reset(qk_tap_dance_state_t *state, void *user_data) {
+void a_circ_reset(qk_tap_dance_state_t *state, void *user_data) { xtap_state.state = 0; }
+void a_circ_finished(qk_tap_dance_state_t *state, void *user_data) {
+    xtap_state.state = cur_dance(state);
     switch (xtap_state.state) {
         case SINGLE_TAP:
-            break;
-        case DOUBLE_TAP:
-            break;
-        case TRIPLE_TAP:
+            tap_code16(KC_LBRC);
+            tap_code(KC_A);
             break;
     }
-    xtap_state.state = 0;
 }
+
+void e_circ_reset(qk_tap_dance_state_t *state, void *user_data) { xtap_state.state = 0; }
+void e_circ_finished(qk_tap_dance_state_t *state, void *user_data) {
+    xtap_state.state = cur_dance(state);
+    switch (xtap_state.state) {
+        case SINGLE_TAP:
+            tap_code16(KC_LBRC);
+            tap_code(KC_E);
+            break;
+    }
+}
+
+void o_circ_reset(qk_tap_dance_state_t *state, void *user_data) { xtap_state.state = 0; }
+void o_circ_finished(qk_tap_dance_state_t *state, void *user_data) {
+    xtap_state.state = cur_dance(state);
+    switch (xtap_state.state) {
+        case SINGLE_TAP:
+            tap_code16(KC_LBRC);
+            tap_code(KC_O);
+            break;
+    }
+}
+
+void e_trem_reset(qk_tap_dance_state_t *state, void *user_data) { xtap_state.state = 0; }
+void e_trem_finished(qk_tap_dance_state_t *state, void *user_data) {
+    xtap_state.state = cur_dance(state);
+    switch (xtap_state.state) {
+        case SINGLE_TAP:
+            tap_code16(LSFT(KC_LBRC));
+            tap_code(KC_E);
+            break;
+    }
+}
+
+void i_trem_reset(qk_tap_dance_state_t *state, void *user_data) { xtap_state.state = 0; }
+void i_trem_finished(qk_tap_dance_state_t *state, void *user_data) {
+    xtap_state.state = cur_dance(state);
+    switch (xtap_state.state) {
+        case SINGLE_TAP:
+            tap_code16(LSFT(KC_LBRC));
+            tap_code(KC_I);
+            break;
+    }
+}
+
 
 qk_tap_dance_action_t tap_dance_actions[] = {
     [TD_USER] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, user_finished, user_reset),
+    [TD_A_CIRC] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, a_circ_finished, a_circ_reset),
+    [TD_E_CIRC] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, e_circ_finished, e_circ_reset),
+    [TD_O_CIRC] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, o_circ_finished, o_circ_reset),
+    [TD_E_TREM] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, e_trem_finished, e_trem_reset),
+    [TD_I_TREM] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, i_trem_finished, i_trem_reset),
 };

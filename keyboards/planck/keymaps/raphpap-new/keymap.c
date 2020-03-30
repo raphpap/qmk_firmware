@@ -17,7 +17,6 @@
 #include QMK_KEYBOARD_H
 #include "muse.h"
 
-
 enum planck_layers {
   _QWERTY,
   _LOWER,
@@ -32,6 +31,30 @@ enum planck_keycodes {
   O_CIRCUM
 };
 
+// tap dance definitions
+typedef struct {
+  bool is_press_action;
+  int state;
+} tap;
+
+enum {
+  SINGLE_TAP = 1,
+  SINGLE_HOLD = 2,
+  DOUBLE_TAP = 3,
+  DOUBLE_HOLD = 4,
+  DOUBLE_SINGLE_TAP = 5,
+  TRIPLE_TAP = 6,
+  TRIPLE_HOLD = 7
+};
+
+enum {
+  TD_USER = 0
+};
+
+int cur_dance (qk_tap_dance_state_t *state);
+void user_finished (qk_tap_dance_state_t *state, void *user_data);
+void user_reset (qk_tap_dance_state_t *state, void *user_data);
+
 #define LOWER MO(_LOWER)
 #define RAISE MO(_RAISE)
 #define ACCENT MO(_ACCENT)
@@ -44,7 +67,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |------+------+------+------+------+-------------+------+------+------+------+------|
  * | TAB  |   A  |   S  |   D  |   F  |   G  |   H  |   J  |   K  |   L  |   ;  |Enter |
  * |------+------+------+------+------+------|------+------+------+------+------+------|
- * | Shift|      |   Z  |   X  |   C  |   V  |   B  |   N  |   M  |   ,  |   .  |  /   |
+ * | Shift| USER |   Z  |   X  |   C  |   V  |   B  |   N  |   M  |   ,  |   .  |  /   |
  * |------+------+------+------+------+------+------+------+------+------+------+------|
  * |Accent| Ctrl | Alt  | GUI  |Lower |    Space    |Raise | Left | Down |  Up  |Right |
  * `-----------------------------------------------------------------------------------'
@@ -52,7 +75,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 [_QWERTY] = LAYOUT_planck_grid(
     KC_ESC,  KC_Q,       KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_BSPC,
     KC_TAB,  KC_A,       KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_ENT,
-    KC_LSFT, XXXXXXX,    KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_NUBS,
+    KC_LSFT, TD(TD_USER),KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_NUBS,
     ACCENT,  KC_LCTL,    KC_LALT, KC_LGUI, LOWER,   KC_SPC,  XXXXXXX, RAISE,   KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT
 ),
 
@@ -70,7 +93,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  [_ACCENT] = LAYOUT_planck_grid(
      _______,  XXXXXXX,       KC_QUOT,  KC_SLASH, LSFT(KC_LBRC),  XXXXXXX,  KC_LBRC, KC_GRV,  LSFT(KC_LBRC),KC_LBRC, XXXXXXX, _______,
      _______,  KC_NUHS,       XXXXXXX,  KC_LBRC,        XXXXXXX,  XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX,       XXXXXXX, XXXXXXX, _______,
-     _______,  KC_LBRC, LSFT(KC_LBRC),  LALT(KC_LBRC),  XXXXXXX,  XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX,       XXXXXXX, XXXXXXX, _______,
+     _______,  KC_LBRC, LSFT(KC_LBRC),  LALT(KC_LBRC),  KC_RBRC,  XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX,       XXXXXXX, XXXXXXX, _______,
      _______,  _______,       _______,  _______,        _______,  _______,  _______, _______, _______,       _______, _______, _______
  ),
 
@@ -167,7 +190,7 @@ bool muse_mode = false;
 uint8_t last_muse_note = 0;
 uint16_t muse_counter = 0;
 uint8_t muse_offset = 70;
-uint16_t muse_tempo = 50;
+uint16_t muse_tempo = 10;
 
 void encoder_update(bool clockwise) {
   if (muse_mode) {
@@ -250,3 +273,100 @@ bool music_mask_user(uint16_t keycode) {
       return true;
   }
 }
+
+// tap dance declarations
+int cur_dance (qk_tap_dance_state_t *state) {
+  if (state->count == 1) {
+    if (state->interrupted || !state->pressed)  return SINGLE_TAP;
+    else return SINGLE_HOLD;
+  }
+  else if (state->count == 2) {
+    if (state->interrupted) return DOUBLE_SINGLE_TAP;
+    else if (state->pressed) return DOUBLE_HOLD;
+    else return DOUBLE_TAP;
+  }
+  if (state->count == 3) {
+    if (state->interrupted || !state->pressed)  return TRIPLE_TAP;
+    else return TRIPLE_HOLD;
+  }
+  else return 8;
+}
+
+static tap xtap_state = {
+  .is_press_action = true,
+  .state = 0
+};
+
+void user_finished (qk_tap_dance_state_t *state, void *user_data) {
+  xtap_state.state = cur_dance(state);
+  switch (xtap_state.state) {
+    case SINGLE_TAP:
+      break;
+    case DOUBLE_TAP:
+      tap_code(KC_R);
+      tap_code(KC_A);
+      tap_code(KC_P);
+      tap_code(KC_H);
+      tap_code(KC_A);
+      tap_code(KC_E);
+      tap_code(KC_L);
+      tap_code(KC_DOT);
+      tap_code(KC_P);
+      tap_code(KC_A);
+      tap_code(KC_P);
+      tap_code(KC_I);
+      tap_code(KC_L);
+      tap_code(KC_L);
+      tap_code(KC_O);
+      tap_code(KC_N);
+      tap_code16(KC_AT);
+      tap_code(KC_G);
+      tap_code(KC_M);
+      tap_code(KC_A);
+      tap_code(KC_I);
+      tap_code(KC_L);
+      tap_code(KC_DOT);
+      tap_code(KC_C);
+      tap_code(KC_O);
+      tap_code(KC_M);
+      break;
+    case TRIPLE_TAP:
+      tap_code(KC_R);
+      tap_code(KC_P);
+      tap_code(KC_A);
+      tap_code(KC_P);
+      tap_code(KC_I);
+      tap_code(KC_L);
+      tap_code(KC_L);
+      tap_code(KC_O);
+      tap_code(KC_N);
+      tap_code16(KC_AT);
+      tap_code(KC_M);
+      tap_code(KC_I);
+      tap_code(KC_R);
+      tap_code(KC_E);
+      tap_code(KC_G);
+      tap_code(KC_O);
+      tap_code(KC_DOT);
+      tap_code(KC_C);
+      tap_code(KC_O);
+      tap_code(KC_M);
+      break;
+  }
+}
+
+void user_reset (qk_tap_dance_state_t *state, void *user_data) {
+  switch (xtap_state.state) {
+    case SINGLE_TAP:
+      break;
+    case DOUBLE_TAP:
+      break;
+    case TRIPLE_TAP:
+      break;
+  }
+  xtap_state.state = 0;
+}
+
+qk_tap_dance_action_t tap_dance_actions[] = {
+  [TD_USER] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, user_finished, user_reset),
+};
